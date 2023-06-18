@@ -1,0 +1,70 @@
+---
+
+- name: Prepare systems for k8s
+  hosts: 'init'
+  remote_user: kube
+  connection: ssh
+  become: true
+  become_method: sudo
+  vars:
+    kube_env: 'dev'
+    kube_ctl: 'ctl.{{ kube_env }}.joris.me'
+    kube_cidr: '10.244.0.0/16'
+
+  tasks:
+
+    - name: Create .kube directory
+      become: true
+      become_user: kube
+      ansible.builtin.file:
+        path: "$HOME/.kube"
+        state: directory
+        mode: "0755"
+        owner: "kube"
+        group: "kube"
+
+    - name: Check for existing cluster
+      become: true
+      ansible.builtin.stat:
+        path: "/etc/kubernetes/admin.conf"
+      register: kube_conf
+
+    - name: Initialize the cluster
+      become: true
+      ansible.builtin.command: |
+        kubeadm init \
+          --pod-network-cidr {{ kube_cidr }}
+#          --control-plane-endpoint {{ kube_ctl }}
+      changed_when: "not kube_conf.stat.exists"
+      when: "not kube_conf.stat.exists"
+      notify:
+        - Copy kube config to user home
+        - Install Flannel
+
+  handlers:
+
+    - name: Copy kube config to user home
+      ansible.builtin.copy:
+        remote_src: true
+        src: "/etc/kubernetes/admin.conf"
+        dest: "/home/kube/.kube/config"
+        owner: "kube"
+        group: "kube"
+        mode: "0600"
+
+    - name: Install Flannel
+      ansible.builtin.command: |
+        kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+
+
+
+
+# Initialize the cluster [MASTER ONLY]:
+#   sudo kubeadm init --control-plane-endpoint=100.104.244.108 --node-name k8s-master --pod-network-cidr=10.244.0.0/16
+
+# (Save the output)
+
+# (Copy the config to your local machine)
+
+# Deploy flannel [LOCAL]:
+#   kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml

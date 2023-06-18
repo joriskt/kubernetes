@@ -1,0 +1,21 @@
+---
+
+- name: Prepare hosts
+  become: true
+  hosts: 'control, worker'
+  tasks:
+
+    - name: Create kube user
+      become: true
+      ansible.builtin.user:
+        name: kube
+        create_home: true
+        shell: /bin/bash
+        state: present
+
+    - name: Allow kube user to use sudo without needing a password
+      become: true
+      ansible.builtin.lineinfile:
+        dest: /etc/sudoers
+        line: 'kube ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'

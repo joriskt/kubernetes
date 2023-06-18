@@ -1,0 +1,8 @@
+[init]
+nuc1
+
+[control]
+nuc1
+
+[worker]
+nuc2
