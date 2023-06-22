@@ -1,6 +1,5 @@
 ---
 
-
 - name: Update all hosts
   hosts: all
   become: true

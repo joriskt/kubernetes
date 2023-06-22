@@ -33,8 +33,8 @@
       become: true
       ansible.builtin.command: |
         kubeadm init \
-          --pod-network-cidr {{ kube_cidr }}
-#          --control-plane-endpoint {{ kube_ctl }}
+          --pod-network-cidr {{ kube_cidr }} \
+          --control-plane-endpoint {{ kube_ctl }}
       changed_when: "not kube_conf.stat.exists"
       when: "not kube_conf.stat.exists"
       notify:
@@ -55,7 +55,6 @@
     - name: Install Flannel
       ansible.builtin.command: |
         kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
-
 
 
 

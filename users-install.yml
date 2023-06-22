@@ -2,7 +2,7 @@
 
 - name: Prepare hosts
   become: true
-  hosts: 'control, worker'
+  hosts: 'init, control, worker'
   tasks:
 
     - name: Create kube user

@@ -1,0 +1,30 @@
+#cloud-config
+users:
+  - default
+  - name: joris
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOl9NrISabSq+MdLMEocqVI2mGtvagfuwi1xE9EWI8u keys-1a
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOI1sFw73HVXpXiaM1ESGP6bz+p8tFSY6/Kum22r9Xg+ keys-1c
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK4wHMpNpYa2qVTeHCdxAIXJqXfqVqUMXGrzNrrBNDBX desk-2a
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOI1sFw73HVXpXiaM1ESGP6bz+p8tFSY6/Kum22r9Xg+ desk-2c
+  - name: ansible
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOl9NrISabSq+MdLMEocqVI2mGtvagfuwi1xE9EWI8u keys-1a
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOI1sFw73HVXpXiaM1ESGP6bz+p8tFSY6/Kum22r9Xg+ keys-1c
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK4wHMpNpYa2qVTeHCdxAIXJqXfqVqUMXGrzNrrBNDBX desk-2a
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOI1sFw73HVXpXiaM1ESGP6bz+p8tFSY6/Kum22r9Xg+ desk-2c
+runcmd:
+  - sed -i -e '/^\(#\|\)PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^#AllowTcpForwarding/s/^.*$/AllowTcpForwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^#AllowAgentForwarding/s/^.*$/AllowAgentForwarding no/' /etc/ssh/sshd_config
+  - curl -fsSL https://tailscale.com/install.sh | sh
+  - tailscale up --auth-key YOUR-TAILSCALE-AUTH-KEY
+  - reboot
+package_update: true
+package_upgrade: true
