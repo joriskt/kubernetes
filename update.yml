@@ -3,11 +3,16 @@
 - name: Update all hosts
   hosts: all
   become: true
+  remote_user: joris
   tasks:
 
-    - name: Update package indexes
-      ansible.builtin.apt:
-        update_cache: true
+    - name: Update sources.list from Debian 11 Bullseye to Debian 12 Bookworm
+      ansible.builtin.replace:
+        regexp: '^(.*)bullseye(.*)$'
+        replace: '\1bookworm\2'
+        path: /etc/apt/sources.list
+      when: "ansible_distribution == 'Debian' and ansible_distribution_version == '11'"
+      action: reboot
 
     - name: Upgrade packages
       ansible.builtin.apt:
@@ -15,3 +20,7 @@
         upgrade: full
         autoclean: true
         autoremove: true
+
+    - name: Reboot
+      ansible.builtin.reboot:
+        msg: reboot

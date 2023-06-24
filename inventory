@@ -1,8 +1,10 @@
-[init]
-nuc1
-
 [control]
 nuc1
+k3s-ams
+k3s-nbg
 
 [worker]
 nuc2
+ruby
+sapphire
+emerald
