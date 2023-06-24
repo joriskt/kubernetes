@@ -1,5 +1,6 @@
+# k3s
 
+Ansible playbooks to install, remove or update k3s.
 
-# Preparation
-
-`ansible-galaxy install geerlingguy.swap`
+## Create VMs / VPSes
+Use [cloud-init.yml](cloud-init.yml) as init script for servers.
