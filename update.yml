@@ -6,13 +6,10 @@
   remote_user: joris
   tasks:
 
-    - name: Update sources.list from Debian 11 Bullseye to Debian 12 Bookworm
-      ansible.builtin.replace:
-        regexp: '^(.*)bullseye(.*)$'
-        replace: '\1bookworm\2'
-        path: /etc/apt/sources.list
+    - name: Upgrade to Debian 12
+      ansible.builtin.include_role:
+        name: deb-upg
       when: "ansible_distribution == 'Debian' and ansible_distribution_version == '11'"
-      action: reboot
 
     - name: Upgrade packages
       ansible.builtin.apt:
@@ -21,6 +18,12 @@
         autoclean: true
         autoremove: true
 
-    - name: Reboot
-      ansible.builtin.reboot:
-        msg: reboot
+    - name: Configure firewall
+      ansible.builtin.include_role:
+        name: firewall
+
+    - name: Install default packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - htop
