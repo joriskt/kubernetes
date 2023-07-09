@@ -20,11 +20,6 @@
     file: ./cluster-init.yml
   when: etcd_state == 'present' and etcd_bootstrap
 
-# - name: Join etcd cluster
-#   ansible.builtin.include_tasks:
-#     file: ./cluster-join.yml
-#   when: etcd_state == 'present' and etcd_bootstrap
-
 - name: Delete etcd systemd unit override
   ansible.builtin.file:
     path: /etc/systemd/system/etcd.service.d
