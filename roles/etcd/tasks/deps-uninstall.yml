@@ -1,0 +1,12 @@
+---
+
+- name: Uninstall dependencies
+  ansible.builtin.apt:
+    name:
+      - etcd-client
+      - etcd-server
+    state: absent
+
+- name: Reload systemd daemons
+  ansible.builtin.systemd:
+    daemon_reload: true

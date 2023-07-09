@@ -1,10 +1,16 @@
+[etcd]
+nuc1 ts_ipv4=100.77.119.88
+k8s-ams ts_ipv4=100.102.29.56
+k8s-nbg ts_ipv4=100.101.53.37
+
 [control]
-nuc1
-k3s-ams
-k3s-nbg
+nuc1 ts_ipv4=100.77.119.88
+k8s-ams ts_ipv4=100.102.29.56
+k8s-nbg ts_ipv4=100.101.53.37
 
 [worker]
 nuc2
-ruby
-sapphire
-emerald
+
+#ruby
+#sapphire
+#emerald

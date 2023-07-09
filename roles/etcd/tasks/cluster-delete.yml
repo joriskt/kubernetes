@@ -1,0 +1,20 @@
+---
+
+- name: Stop etcd
+  ansible.builtin.systemd_service:
+    name: etcd
+    state: stopped
+
+- name: Delete etcd state
+  ansible.builtin.file:
+    path: /var/lib/etcd/default
+    state: absent
+
+- name: Delete etcd systemd unit override
+  ansible.builtin.file:
+    path: /etc/systemd/system/etcd.service.d
+    state: absent
+
+- name: Reload systemd daemons
+  ansible.builtin.systemd:
+    daemon_reload: true

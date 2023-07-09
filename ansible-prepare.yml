@@ -2,27 +2,28 @@
 
 - name: Prepare hosts
   become: true
-  hosts: 'init, control, worker'
+  remote_user: joris
+  hosts: all
   tasks:
 
-    - name: Create kube user
+    - name: Create ansible user
       ansible.builtin.user:
-        name: kube
+        name: ansible
         create_home: true
         shell: /bin/bash
         state: present
 
-    - name: Allow kube user to use sudo without needing a password
+    - name: Allow ansible user to use sudo without needing a password
       ansible.builtin.lineinfile:
         dest: /etc/sudoers
-        line: 'kube ALL=(ALL) NOPASSWD: ALL'
+        line: 'ansible ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
 
     - name: Copy authorized_keys from root user
       ansible.builtin.copy:
         remote_src: true
         src: /root/.ssh
-        dest: /home/kube/
-        owner: kube
-        group: kube
+        dest: /home/ansible/
+        owner: ansible
+        group: ansible
         mode: '0700'

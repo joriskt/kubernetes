@@ -1,0 +1,37 @@
+---
+
+# - name: Delete existing etcd cluster
+#   when: etcd_state == 'absent' or etcd_reset
+#   ansible.builtin.include_tasks:
+#     file: ./cluster-delete.yml
+
+# - name: Delete dependencies
+#   ansible.builtin.include_tasks:
+#     file: ./deps-uninstall.yml
+#   when: etcd_state == 'absent'
+
+- name: Install dependencies
+  ansible.builtin.include_tasks:
+    file: ./deps-install.yml
+  when: etcd_state == 'present'
+
+- name: Bootstrap etcd cluster
+  ansible.builtin.include_tasks:
+    file: ./cluster-init.yml
+  when: etcd_state == 'present' and etcd_bootstrap
+
+# - name: Join etcd cluster
+#   ansible.builtin.include_tasks:
+#     file: ./cluster-join.yml
+#   when: etcd_state == 'present' and etcd_bootstrap
+
+- name: Delete etcd systemd unit override
+  ansible.builtin.file:
+    path: /etc/systemd/system/etcd.service.d
+    state: absent
+  when: etcd_state == 'absent'
+
+- name: Reload systemd daemons
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: etcd_state == 'absent'

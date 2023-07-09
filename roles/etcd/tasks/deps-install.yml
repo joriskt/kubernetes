@@ -1,0 +1,13 @@
+---
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - etcd-client
+      - etcd-server
+
+# - name: Collect Tailscale IPv4 address
+#   ansible.builtin.command:
+#     cmd: "tailscale ip --4"
+#   register: ts_ipv4
+#   changed_when: false

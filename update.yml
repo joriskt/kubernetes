@@ -3,7 +3,7 @@
 - name: Update all hosts
   hosts: all
   become: true
-  remote_user: joris
+  remote_user: ansible
   tasks:
 
     - name: Upgrade to Debian 12
