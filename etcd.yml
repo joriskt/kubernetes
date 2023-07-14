@@ -7,9 +7,9 @@
   become: true
   become_method: sudo
   vars:
-    etcd_state: present
-    etcd_bootstrap: true
-    etcd_reset: true
+    etcd_state: absent
+    etcd_bootstrap: false
+    etcd_reset: false
   tasks:
 
     - name: Prepare to install k8s apt signing key

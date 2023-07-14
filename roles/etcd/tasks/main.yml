@@ -30,3 +30,8 @@
   ansible.builtin.systemd:
     daemon_reload: true
   when: etcd_state == 'absent'
+
+- name: Uninstall deps
+  ansible.builtin.include_tasks:
+    file: ./deps-uninstall.yml
+  when: etcd_state == 'absent'
