@@ -1,5 +1,25 @@
 ---
 
+- name: Prepare to install k8s apt signing key
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gpg
+      - gpg-agent
+    state: present
+
+- name: Install k8s apt key
+  ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: Add k8s apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+    filename: kubernetes
+    state: present
+    update_cache: true
+
 - name: Install dependencies
   ansible.builtin.apt:
     name:

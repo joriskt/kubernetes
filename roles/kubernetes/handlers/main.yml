@@ -1,0 +1,14 @@
+---
+
+- name: Copy kube config to user home
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/etc/kubernetes/admin.conf"
+    dest: "/home/joris/.kube/config"
+    owner: "joris"
+    group: "joris"
+    mode: "0600"
+
+- name: Install Flannel
+  ansible.builtin.command: |
+    kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
