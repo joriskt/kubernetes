@@ -12,3 +12,31 @@
 - name: Install Flannel
   ansible.builtin.command: |
     kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+
+- name: Generate join token
+  tags:
+    - join
+  ansible.builtin.command: kubeadm token create --print-join-command
+  register: join_token
+  changed_when: false
+  when: inventory_hostname == groups['control'][0]
+  notify:
+    - Join control nodes
+
+- name: Join control nodes
+  tags:
+    - join
+  ansible.builtin.command: |
+    {{ hostvars[groups['control'][0]].join_token.stdout }} --control-plane
+  when: inventory_hostname != groups['control'][0] and inventory_hostname in groups['control']
+  changed_when: true
+  notify:
+    - Join worker nodes
+
+- name: Join worker nodes
+  tags:
+    - join
+  ansible.builtin.command: |
+    {{ hostvars[groups['control'][0]].join_token.stdout }} --control-plane
+  when: inventory_hostname in groups['worker']
+  changed_when: true

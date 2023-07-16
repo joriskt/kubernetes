@@ -1,18 +1,30 @@
 ---
 
+# TODO: Actually check for an existing etcd cluster/state and don't do anything unless etcd_reset=true.
+
 - name: Stop etcd
   ansible.builtin.systemd_service:
     name: etcd
     state: stopped
+  failed_when: false
 
 - name: Delete etcd state
   ansible.builtin.file:
     path: /var/lib/etcd/default
     state: absent
+
 - name: Delete etcd systemd unit override
   ansible.builtin.file:
     path: /etc/systemd/system/etcd.service.d
     state: absent
+
+# - name: Create etcd state directory if it doesn't exist
+#   ansible.builtin.file:
+#     path: /var/lib/etcd/default
+#     state: directory
+#     mode: "0600"
+#     owner: etcd
+#     group: etcd
 
 - name: Create etcd override directory
   ansible.builtin.file:
@@ -20,15 +32,15 @@
     state: directory
     mode: "0644"
 
-# - name: Collect Tailscale IPv4 address
-#   ansible.builtin.command:
-#     cmd: "tailscale ip --4"
-#   register: ts_ipv4
-#   changed_when: false
+- name: Collect Tailscale IPv4 address
+  ansible.builtin.command:
+    cmd: "tailscale ip --4"
+  register: ts_ipv4
+  changed_when: false
 
 - name: Install etcd config template
   ansible.builtin.template:
-    src: templates/systemd/etcd-init.conf.j2
+    src: templates/systemd/etcd.conf.j2
     dest: /etc/systemd/system/etcd.service.d/override.conf
     mode: "0644"
   register: conf

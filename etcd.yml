@@ -7,37 +7,33 @@
   become: true
   become_method: sudo
   vars:
-    etcd_state: absent
-    etcd_bootstrap: false
+    etcd_state: present
+    etcd_bootstrap: true
     etcd_reset: false
   tasks:
 
-    - name: Prepare to install k8s apt signing key
-      ansible.builtin.apt:
-        name:
-          - ca-certificates
-          - curl
-          - gpg
-          - gpg-agent
-        state: present
+    # - name: Prepare to install k8s apt signing key
+    #   ansible.builtin.apt:
+    #     name:
+    #       - ca-certificates
+    #       - curl
+    #       - gpg
+    #       - gpg-agent
+    #     state: present
 
-    - name: Install k8s apt key
-      ansible.builtin.apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        # dest: /usr/share/keyrings/google-cloud.asc
-        # mode: '0600'
+    # - name: Install k8s apt key
+    #   ansible.builtin.apt_key:
+    #     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    #     # dest: /usr/share/keyrings/google-cloud.asc
+    #     # mode: '0600'
 
-    - name: Add k8s apt repository
-      ansible.builtin.apt_repository:
-        repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
-        filename: kubernetes
-        state: present
-        update_cache: true
+    # - name: Add k8s apt repository
+    #   ansible.builtin.apt_repository:
+    #     repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+    #     filename: kubernetes
+    #     state: present
+    #     update_cache: true
 
     - name: Install, bootstrap and join nodes to etcd cluster
       ansible.builtin.include_role:
         name: etcd
-      # vars:
-      #   etcd_state: etcd_state
-      #   etcd_bootstrap: etcd_bootstrap
-      #   etcd_reset: etcd_reset

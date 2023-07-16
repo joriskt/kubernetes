@@ -20,10 +20,9 @@
     file: ./cluster-init.yml
   when: etcd_state == 'present' and etcd_bootstrap
 
-- name: Delete etcd systemd unit override
-  ansible.builtin.file:
-    path: /etc/systemd/system/etcd.service.d
-    state: absent
+- name: Delete cluster
+  ansible.builtin.include_tasks:
+    file: ./cluster-delete.yml
   when: etcd_state == 'absent'
 
 - name: Reload systemd daemons

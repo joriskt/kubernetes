@@ -43,14 +43,22 @@
     mode: "0744"
 
 - name: Generate default containerd config /etc/containerd/config.toml
-  ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
-  changed_when: true
+  ansible.builtin.shell: containerd config default > /tmp/containerd.toml
+  changed_when: false
 
 - name: Set SystemdCgroup=true in containerd config
   ansible.builtin.replace:
-    path: /etc/containerd/config.toml
+    path: /tmp/containerd.toml
     regexp: (\s)SystemdCgroup = false
     replace: \1SystemdCgroup = true
+  register: containerd
+
+- name: Copy containerd config if it differs
+  ansible.builtin.copy:
+    remote_src: true
+    src: /tmp/containerd.toml
+    dest: /etc/containerd/config.toml
+    mode: '0744'
   register: containerd
 
 - name: Restart containerd when config changed
@@ -76,14 +84,14 @@
   when: sysctl_changed.changed
 
 ########################
-# Prep for 
+# Prep
 ########################
 
 - name: Create .kube directory
   become: true
   become_user: joris
   ansible.builtin.file:
-    path: "$HOME/.kube"
+    path: "/home/joris/.kube"
     state: directory
     mode: "0755"
     owner: "joris"
@@ -97,17 +105,35 @@
   register: kube_conf
   when: inventory_hostname == groups['control'][0]
 
+- name: Dump stat
+  ansible.builtin.debug:
+    msg: "{{ kube_conf }}"
+  when: inventory_hostname == groups['control'][0]
+
 - name: Initialize the cluster
   become: true
   ansible.builtin.command: |
     kubeadm init \
       --pod-network-cidr {{ kube_cidr }} \
-      --control-plane-endpoint {{ kube_ctl }}
+      --control-plane-endpoint {{ kube_ctl }} \
+      --apiserver-advertise-address {{ ts_ipv4 }} \
+      --upload-certs
   changed_when: "not kube_conf.stat.exists"
-  when: "not kube_conf.stat.exists and inventory_hostname == groups['control'][0]"
+  when: "inventory_hostname == groups['control'][0] and not kube_conf.stat.exists"
   notify:
     - Copy kube config to user home
     - Install Flannel
+    - Generate join token
+
+- name: Start join handlers
+  ansible.builtin.debug: ''
+  tags:
+    - join
+  changed_when: true
+  notify:
+    - Generate join token
+    - Join control nodes
+    - Join worker nodes
 
 # - name: Import Google Cloud public signing key
 #   become: true
@@ -157,3 +183,17 @@
 
 # Deploy flannel [LOCAL]:
 #   kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+
+
+
+
+
+    kube_cidr: 10.244.0.0/16
+    kube_ctl: ctl.joris.me
+
+
+    kubeadm init \
+      --pod-network-cidr 10.244.0.0/16 \
+      --control-plane-endpoint ctl.joris.me \
+      --apiserver-advertise-address $(tailscale ip --4) \
+      --upload-certs 

@@ -5,6 +5,9 @@
   become: true
   remote_user: ansible
   become_method: sudo
+  vars:
+    kube_cidr: 10.244.0.0/16
+    kube_ctl: ctl.joris.me
   tasks:
 
     - name: Run
