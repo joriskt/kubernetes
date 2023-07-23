@@ -21,6 +21,16 @@
     default: allow
     direction: outgoing
 
-- name: Reload and enable ufw
+- name: Install UFW Docker fix
+  ansible.builtin.template:
+    src: templates/ufw-docker.rules
+    dest: /etc/ufw/after.rules
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+    - Reload UFW
+
+- name: Enable and start UFW
   community.general.ufw:
     state: enabled

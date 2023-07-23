@@ -28,3 +28,6 @@
           - curl
           - htop
           - acl
+          - apparmor # for docker stuff
+          - prometheus-node-exporter # for monitoring
+

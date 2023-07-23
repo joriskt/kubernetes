@@ -1,26 +1,17 @@
 [kube]
 nuc1
 nuc2
-kube1
-kube2
-kube3
 
 [etcd]
-kube1
-kube2
-kube3
 
 [control]
-kube1
-kube2
-kube3
 
 [worker]
 nuc1
 nuc2
-kube1
-kube2
-kube3
 
 [update]
 foundry
+auth
+manager
+monitor
